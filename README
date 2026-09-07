@@ -366,14 +366,4 @@ Built with ❤️ using only **free and open-source** technologies.
 
 ---
 
-**Note**: This is a demo/portfolio project. Product images are placeholders. In production, you would need to:
-- Add proper product images
-- Implement image upload (Multer)
-- Add comprehensive error handling
-- Set up production environment
-- Configure CORS properly
-- Add rate limiting
-- Implement caching
-- Set up CI/CD
 
-For questions or support, please open an issue on GitHub.
