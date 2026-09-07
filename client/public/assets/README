@@ -1,0 +1,285 @@
+# 📸 Assets Folder - Image Guidelines
+
+This folder contains all static assets (images, icons, etc.) used in the VibeMatch application.
+
+## 📁 Folder Structure
+
+```
+assets/
+├── images/
+│   ├── products/          # Product images
+│   │   ├── dresses/
+│   │   ├── jewelry/
+│   │   └── cosmetics/
+│   ├── hero/              # Hero section images
+│   ├── vibes/             # Vibe category banners
+│   └── placeholders/      # Placeholder images
+├── icons/                 # UI icons and logos
+└── README.md             # This file
+```
+
+## 🎨 Image Requirements
+
+### Product Images
+
+#### Dresses (`/images/products/dresses/`)
+- **Format**: JPG or PNG
+- **Dimensions**: 800x1200px (2:3 ratio)
+- **Background**: White or transparent
+- **Naming**: `dress-[vibe]-[id].jpg`
+  - Example: `dress-party-001.jpg`, `dress-wedding-001.jpg`
+- **Needed Vibes**:
+  - Party
+  - Wedding
+  - Glam
+  - Cocktail
+  - Casual
+  - Brunch
+  - Date Night
+  - Festival
+
+#### Jewelry/Ornaments (`/images/products/jewelry/`)
+- **Format**: PNG with transparent background
+- **Dimensions**: 600x600px (1:1 ratio)
+- **Types Needed**:
+  - Earrings: `earrings-[style]-[id].png`
+  - Necklaces: `necklace-[style]-[id].png`
+  - Bracelets: `bracelet-[style]-[id].png`
+  - Rings: `ring-[style]-[id].png`
+- **Styles**: gold, silver, rose-gold, diamond
+
+#### Cosmetics (`/images/products/cosmetics/`)
+- **Format**: PNG with transparent background
+- **Dimensions**: 400x400px (1:1 ratio)
+- **Types Needed**:
+  - Lipsticks: `lipstick-[shade]-[id].png`
+  - Eyeshadow palettes: `eyeshadow-[palette]-[id].png`
+  - Blush: `blush-[shade]-[id].png`
+  - Highlighter: `highlighter-[shade]-[id].png`
+- **Undertone Categories**: warm, cool, neutral
+
+### Hero Section (`/images/hero/`)
+- **Format**: JPG (optimized)
+- **Dimensions**: 1920x1080px (16:9 ratio)
+- **Files Needed**:
+  - `hero-main.jpg` - Main landing page background
+  - `hero-quiz.jpg` - Vibe quiz background
+  - `hero-recommendations.jpg` - Recommendations page background
+
+### Vibe Category Banners (`/images/vibes/`)
+- **Format**: JPG
+- **Dimensions**: 1200x400px (3:1 ratio)
+- **Files Needed** (one for each vibe):
+  - `party-vibe.jpg`
+  - `wedding-vibe.jpg`
+  - `glam-vibe.jpg`
+  - `cocktail-vibe.jpg`
+  - `casual-vibe.jpg`
+  - `brunch-vibe.jpg`
+  - `date-night-vibe.jpg`
+  - `festival-vibe.jpg`
+
+### Icons (`/icons/`)
+- **Format**: SVG or PNG
+- **Dimensions**: 64x64px for PNG, scalable for SVG
+- **Files Needed**:
+  - `logo.svg` - App logo
+  - `logo-white.svg` - White version for dark backgrounds
+  - `favicon.ico` - Browser favicon (16x16, 32x32, 64x64)
+  - `dress-icon.svg` - Dress category icon
+  - `jewelry-icon.svg` - Jewelry category icon
+  - `cosmetic-icon.svg` - Cosmetic category icon
+
+## 📊 Placeholder Images
+
+For development, you can use these free image sources:
+
+### Free Stock Photos
+1. **Unsplash**: https://unsplash.com/
+   - Search: "fashion", "dress", "jewelry", "makeup"
+   - License: Free for commercial use
+
+2. **Pexels**: https://www.pexels.com/
+   - Search: "evening dress", "party outfit", "jewelry"
+   - License: Free for commercial use
+
+3. **Pixabay**: https://pixabay.com/
+   - Search: "fashion", "accessories", "cosmetics"
+   - License: Free for commercial use
+
+### Placeholder Services (During Development)
+- **Placeholder.com**: `https://via.placeholder.com/800x1200/E5E7EB/6B7280?text=Dress`
+- **Unsplash Random**: `https://source.unsplash.com/800x1200/?dress`
+- **Lorem Picsum**: `https://picsum.photos/800/1200`
+
+## 🎯 Image Optimization
+
+Before adding images, optimize them:
+
+### Tools:
+1. **TinyPNG**: https://tinypng.com/ (Online compression)
+2. **ImageOptim**: https://imageoptim.com/ (Mac app)
+3. **Squoosh**: https://squoosh.app/ (Google's web tool)
+
+### Command Line (Using ImageMagick):
+```bash
+# Install ImageMagick
+sudo apt install imagemagick  # Linux
+brew install imagemagick      # Mac
+
+# Resize image
+magick input.jpg -resize 800x1200 output.jpg
+
+# Compress JPEG (quality 85)
+magick input.jpg -quality 85 output.jpg
+
+# Convert to WebP (better compression)
+magick input.jpg -quality 80 output.webp
+```
+
+## 🔄 Using Images in React Components
+
+### Import from public folder:
+```jsx
+<img src="/assets/images/products/dresses/dress-party-001.jpg" alt="Party Dress" />
+```
+
+### Import directly (for bundling):
+```jsx
+import dressImage from '@/assets/images/products/dresses/dress-party-001.jpg';
+<img src={dressImage} alt="Party Dress" />
+```
+
+### Dynamic imports:
+```jsx
+const getDressImage = (vibe, id) => {
+  return `/assets/images/products/dresses/dress-${vibe}-${id}.jpg`;
+};
+
+<img src={getDressImage('party', '001')} alt="Dress" />
+```
+
+## 📦 Sample Product Data Structure
+
+When adding products to MongoDB, use this structure:
+
+```javascript
+{
+  name: "Floral Maxi Dress",
+  images: [
+    {
+      url: "/assets/images/products/dresses/dress-party-001.jpg",
+      alt: "Front view",
+      isPrimary: true
+    },
+    {
+      url: "/assets/images/products/dresses/dress-party-001-back.jpg",
+      alt: "Back view",
+      isPrimary: false
+    }
+  ],
+  category: "dress",
+  vibeTags: ["Party", "Glam"],
+  // ...other fields
+}
+```
+
+## 🎨 Color Reference for Vibes
+
+Use these color schemes when selecting/editing images:
+
+| Vibe | Primary Color | Secondary Color | Mood |
+|------|--------------|-----------------|------|
+| Party | #f5576c | #ffc371 | Energetic, Bold |
+| Wedding | #fcb69f | #ffecd2 | Elegant, Romantic |
+| Glam | #8B5CF6 | #EC4899 | Luxurious, Sparkly |
+| Cocktail | #3B82F6 | #8B5CF6 | Sophisticated, Chic |
+| Casual | #10B981 | #34D399 | Relaxed, Comfortable |
+| Brunch | #F59E0B | #FBBF24 | Bright, Fresh |
+| Date Night | #EF4444 | #F87171 | Romantic, Intimate |
+| Festival | #8B5CF6 | #EC4899 | Vibrant, Fun |
+
+## 📝 Naming Conventions
+
+### Be Consistent:
+- Use lowercase
+- Use hyphens for spaces
+- Include category and identifier
+- Add color/variant if needed
+
+### Examples:
+```
+✅ Good:
+- dress-party-floral-001.jpg
+- earrings-gold-hoop-001.png
+- lipstick-red-matte-001.png
+
+❌ Bad:
+- IMG_1234.jpg
+- product_image.png
+- dress.jpg
+```
+
+## 🚀 Quick Start - Add Sample Images
+
+### Option 1: Manual Download
+1. Go to Unsplash.com
+2. Search for "fashion dress"
+3. Download images (800x1200)
+4. Rename according to conventions
+5. Place in appropriate folders
+
+### Option 2: Using Placeholders (Development)
+```jsx
+// Temporary placeholder until you get real images
+const placeholderImage = (category, width = 800, height = 1200) => {
+  return `https://via.placeholder.com/${width}x${height}/E5E7EB/6B7280?text=${category}`;
+};
+
+<img src={placeholderImage('Dress')} alt="Product" />
+```
+
+## 📏 Image Size Budget
+
+Keep total image sizes reasonable:
+
+| Category | Images | Size per Image | Total Budget |
+|----------|--------|----------------|--------------|
+| Dresses | 40+ | 150-200 KB | ~8 MB |
+| Jewelry | 30+ | 50-100 KB | ~3 MB |
+| Cosmetics | 30+ | 50-100 KB | ~3 MB |
+| Hero/Vibes | 10 | 200-300 KB | ~3 MB |
+| **Total** | **110+** | - | **~17 MB** |
+
+## 🔐 Copyright Notice
+
+⚠️ **Important**: 
+- Only use images you have rights to
+- For commercial projects, use:
+  - Your own photography
+  - Licensed stock photos
+  - Royalty-free images with proper attribution
+- Check licenses before use
+- Keep attribution records in `ATTRIBUTIONS.md`
+
+## 📚 Resources
+
+### Stock Photo Sites (Free)
+- [Unsplash](https://unsplash.com/) - High quality, free
+- [Pexels](https://www.pexels.com/) - Free stock photos
+- [Pixabay](https://pixabay.com/) - Free images
+- [Burst by Shopify](https://burst.shopify.com/) - eCommerce focused
+
+### Stock Photo Sites (Paid)
+- [Adobe Stock](https://stock.adobe.com/) - Professional quality
+- [Shutterstock](https://www.shutterstock.com/) - Large library
+- [Getty Images](https://www.gettyimages.com/) - Premium content
+
+### Design Tools
+- [Figma](https://figma.com/) - Design mockups
+- [Canva](https://canva.com/) - Easy editing
+- [Photopea](https://www.photopea.com/) - Online Photoshop alternative
+
+---
+
+**Need Help?** Check the main README.md or open an issue on GitHub.
