@@ -37,14 +37,14 @@ flowchart LR
   API -. checkout .-> Pay[Razorpay]
 ```
 
-### How Recommendations Work
+The recommendation flow is deterministic and rules-based:
 
 1. The quiz maps jewelry preference to an undertone and records vibe, silhouette, season, and size preferences.
 2. The matching endpoint selects active dresses for the chosen vibe and, when provided, the preferred silhouette.
 3. For each dress, it looks for accessories with compatible tags and cosmetics that match the selected undertone and vibe.
 4. It combines the best available matches into looks, applies a 10% bundle discount, and sorts results by a compatibility score based on shared seasons, undertone, and tags.
 
-The core outfit matcher is deterministic and rules-based; optional AI styling integrations are separate from that matching flow.
+Optional AI styling integrations are separate from the core matching flow.
 
 ## Screenshots
 
@@ -52,7 +52,6 @@ The core outfit matcher is deterministic and rules-based; optional AI styling in
 ![VibeMatch style quiz](docs/screenshots/style-quiz.png)
 ![VibeMatch vibe preferences](docs/screenshots/quiz-preferences.png)
 ![VibeMatch checkout with the Razorpay-backed online payment option selected](docs/screenshots/razorpay-checkout.png)
-![VibeMatch Razorpay-backed online payment option](docs/screenshots/razorpay-checkout.png)
 
 ## Project Structure
 
