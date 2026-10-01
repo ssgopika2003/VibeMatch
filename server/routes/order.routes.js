@@ -34,7 +34,7 @@ function getRazorpayState() {
   }
 
   if (!keyId || !keySecret) {
-    if (dummyEnabled && process.env.NODE_ENV !== 'production') {
+    if (dummyEnabled) {
       return {
         enabled: true,
         dummyEnabled: true,
@@ -64,7 +64,7 @@ function getRazorpayState() {
 
   return {
     enabled: true,
-    dummyEnabled: false,
+    dummyEnabled,
     client: razorpay,
     keyId,
     keySecret,
@@ -76,15 +76,6 @@ function getRazorpayState() {
 router.post('/create-razorpay-order', auth(), async (req, res) => {
   try {
     const razorpayState = getRazorpayState();
-    const amount = Number(req.body.amount);
-    const currency = (req.body.currency || 'INR').toUpperCase();
-
-    if (!Number.isFinite(amount) || amount <= 0 || currency !== 'INR') {
-      return res.status(400).json({
-        success: false,
-        message: 'A valid INR payment amount is required'
-      });
-    }
 
     if (!razorpayState.enabled) {
       return res.status(503).json({
@@ -100,8 +91,8 @@ router.post('/create-razorpay-order', auth(), async (req, res) => {
           mockOrder: true,
           order: {
             id: `DUMMY_ORDER_${Date.now()}`,
-            amount: Math.round(amount * 100),
-            currency,
+            amount: (req.body.amount || 0) * 100,
+            currency: req.body.currency || 'INR',
             status: 'created'
           },
           key: razorpayState.keyId,
@@ -115,8 +106,10 @@ router.post('/create-razorpay-order', auth(), async (req, res) => {
       });
     }
 
+    const { amount, currency = 'INR' } = req.body;
+    
     const options = {
-      amount: Math.round(amount * 100),
+      amount: amount * 100, // Convert to paise
       currency,
       receipt: `receipt_${Date.now()}`
     };
@@ -146,7 +139,9 @@ router.post('/verify-payment', auth(), async (req, res) => {
       razorpay_payment_id,
       razorpay_signature,
       items,
-      shippingAddress
+      shippingAddress,
+      isCompleteLook,
+      lookName
     } = req.body;
 
     const razorpayState = getRazorpayState();
@@ -158,21 +153,12 @@ router.post('/verify-payment', auth(), async (req, res) => {
       });
     }
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Payment verification details are required'
+        message: 'No items provided for payment verification'
       });
     }
-
-    if (!Array.isArray(items) || items.length === 0 || !shippingAddress) {
-      return res.status(400).json({
-        success: false,
-        message: 'Items and a shipping address are required'
-      });
-    }
-
-    let verifiedPayment = null;
     
     if (!razorpayState.dummyEnabled) {
       const sign = razorpay_order_id + '|' + razorpay_payment_id;
@@ -187,43 +173,21 @@ router.post('/verify-payment', auth(), async (req, res) => {
           message: 'Invalid payment signature'
         });
       }
-
-      verifiedPayment = await razorpayState.client.payments.fetch(razorpay_payment_id);
-      if (verifiedPayment.order_id !== razorpay_order_id || verifiedPayment.status !== 'captured') {
-        return res.status(400).json({
-          success: false,
-          message: 'Payment is not captured for this order'
-        });
-      }
     }
     
     // Calculate totals
     let subtotal = 0;
     const orderItems = [];
-    const productsToSave = new Map();
     
     for (const item of items) {
-      const quantity = Number(item?.quantity);
-      if (!item?.productId || !Number.isInteger(quantity) || quantity <= 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Each item must include a product and a positive whole-number quantity'
-        });
+      if (!item?.productId || !item?.quantity || item.quantity <= 0) {
+        continue;
       }
 
-      const productId = String(item.productId);
-      let product = productsToSave.get(productId);
-      if (!product) {
-        product = await Product.findById(item.productId);
-      }
-      if (!product) {
-        return res.status(400).json({
-          success: false,
-          message: 'One or more products are no longer available'
-        });
-      }
+      const product = await Product.findById(item.productId);
+      if (!product) continue;
       
-      const itemTotal = product.price * quantity;
+      const itemTotal = product.price * item.quantity;
       subtotal += itemTotal;
       
       orderItems.push({
@@ -231,11 +195,12 @@ router.post('/verify-payment', auth(), async (req, res) => {
         name: product.name,
         image: product.images?.[0]?.url || '',
         price: product.price,
-        quantity,
+        quantity: item.quantity,
         size: item.size,
         color: item.color
       });
       
+      // Update stock safely for both variant and non-variant products
       if (product.variants && product.variants.length > 0) {
         const variant = product.variants.find(v => {
           const sizeMatch = item.size ? v.size === item.size : true;
@@ -243,26 +208,16 @@ router.post('/verify-payment', auth(), async (req, res) => {
           return sizeMatch && colorMatch;
         });
 
-        if (!variant || variant.stock < quantity) {
-          return res.status(409).json({
-            success: false,
-            message: `${product.name} does not have enough stock`
-          });
+        if (variant && variant.stock >= item.quantity) {
+          variant.stock -= item.quantity;
+          product.totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
         }
-        variant.stock -= quantity;
-        product.totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
-      } else if (typeof product.totalStock === 'number') {
-        if (product.totalStock < quantity) {
-          return res.status(409).json({
-            success: false,
-            message: `${product.name} does not have enough stock`
-          });
-        }
-        product.totalStock -= quantity;
+      } else if (typeof product.totalStock === 'number' && product.totalStock >= item.quantity) {
+        product.totalStock -= item.quantity;
       }
 
-      product.purchaseCount = (product.purchaseCount || 0) + quantity;
-      productsToSave.set(productId, product);
+      product.purchaseCount += item.quantity;
+      await product.save();
     }
 
     if (orderItems.length === 0) {
@@ -272,26 +227,17 @@ router.post('/verify-payment', auth(), async (req, res) => {
       });
     }
     
-    const tax = Math.round(subtotal * 0.18 * 100) / 100;
-    const shippingCharge = subtotal > 1000 ? 0 : 50;
-    const discount = 0;
-    const total = Math.round((subtotal + tax + shippingCharge) * 100) / 100;
-
-    if (verifiedPayment && verifiedPayment.amount !== Math.round(total * 100)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Payment amount does not match the order total'
-      });
-    }
-
-    for (const product of productsToSave.values()) {
-      await product.save();
-    }
+    const tax = subtotal * 0.18; // 18% GST
+    const shippingCharge = subtotal > 2000 ? 0 : 100;
+    const discount = isCompleteLook ? subtotal * 0.1 : 0; // 10% bundle discount
+    const total = subtotal + tax + shippingCharge - discount;
     
     // Create order
     const order = new Order({
       user: req.user.id,
       items: orderItems,
+      isCompleteLook,
+      lookName,
       shippingAddress,
       payment: {
         method: 'razorpay',
@@ -336,7 +282,7 @@ router.post('/verify-payment', auth(), async (req, res) => {
 // Create Order (COD or after payment verification)
 router.post('/', auth(), async (req, res) => {
   try {
-    const { items, shippingAddress, payment } = req.body;
+    const { items, shippingAddress, payment, subtotal, tax, shippingCharge, discount = 0, total } = req.body;
 
     // Validate required fields
     if (!items || items.length === 0) {
@@ -346,66 +292,17 @@ router.post('/', auth(), async (req, res) => {
       });
     }
 
-    if (!shippingAddress || payment?.method !== 'cod') {
+    if (!shippingAddress || !payment) {
       return res.status(400).json({
         success: false,
-        message: 'A shipping address and cash-on-delivery payment method are required'
+        message: 'Shipping address and payment method are required'
       });
     }
-
-    const orderItems = [];
-    let subtotal = 0;
-
-    for (const item of items) {
-      const productId = item?.product || item?.productId;
-      const quantity = Number(item?.quantity);
-      if (!productId || !Number.isInteger(quantity) || quantity <= 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Each item must include a product and a positive whole-number quantity'
-        });
-      }
-
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(400).json({
-          success: false,
-          message: 'One or more products are no longer available'
-        });
-      }
-
-      const variant = product.variants?.find(v => {
-        const sizeMatch = item.size ? v.size === item.size : true;
-        const colorMatch = item.color ? v.color === item.color : !v.color || v.color === '';
-        return sizeMatch && colorMatch;
-      });
-      if (product.variants?.length && (!variant || variant.stock < quantity)) {
-        return res.status(409).json({ success: false, message: `${product.name} does not have enough stock` });
-      }
-      if (!product.variants?.length && typeof product.totalStock === 'number' && product.totalStock < quantity) {
-        return res.status(409).json({ success: false, message: `${product.name} does not have enough stock` });
-      }
-
-      subtotal += product.price * quantity;
-      orderItems.push({
-        product: product._id,
-        name: product.name,
-        image: product.images?.[0]?.url || '',
-        price: product.price,
-        quantity,
-        size: item.size,
-        color: item.color
-      });
-    }
-
-    const tax = Math.round(subtotal * 0.18 * 100) / 100;
-    const shippingCharge = subtotal > 1000 ? 0 : 50;
-    const total = Math.round((subtotal + tax + shippingCharge) * 100) / 100;
 
     // Create order
     const order = new Order({
       user: req.user.id,
-      items: orderItems,
+      items,
       shippingAddress,
       payment: {
         method: payment.method,
@@ -417,7 +314,7 @@ router.post('/', auth(), async (req, res) => {
       subtotal,
       tax,
       shippingCharge,
-      discount: 0,
+      discount,
       total,
       status: 'placed',
       timeline: [{
@@ -430,7 +327,7 @@ router.post('/', auth(), async (req, res) => {
     await order.save();
 
     // Update product stock and purchase count
-    for (const item of order.items) {
+    for (const item of items) {
       const product = await Product.findById(item.product);
       if (product) {
         product.purchaseCount = (product.purchaseCount || 0) + item.quantity;

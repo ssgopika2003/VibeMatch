@@ -185,7 +185,7 @@ const Home = () => {
                 </motion.button>
               </Link>
 
-              <Link to="/vibe-quiz">
+              <Link to="/recommendations">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -385,7 +385,7 @@ const Home = () => {
                   </motion.li>
                 ))}
               </ul>
-              <Link to="/vibe-quiz">
+              <Link to="/recommendations">
                 <motion.button
                   whileHover={{ scale: 1.05, x: 4 }}
                   whileTap={{ scale: 0.95 }}
@@ -427,7 +427,7 @@ const Home = () => {
             <p className="text-xl text-gray-300">
               Chat with our AI assistant for personalized style advice and product recommendations
             </p>
-            <Link to="/vibe-quiz">
+            <Link to="/recommendations">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

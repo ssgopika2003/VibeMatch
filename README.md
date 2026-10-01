@@ -51,6 +51,8 @@ The core outfit matcher is deterministic and rules-based; optional AI styling in
 ![VibeMatch home page](docs/screenshots/home.png)
 ![VibeMatch style quiz](docs/screenshots/style-quiz.png)
 ![VibeMatch vibe preferences](docs/screenshots/quiz-preferences.png)
+![VibeMatch checkout with the Razorpay-backed online payment option selected](docs/screenshots/razorpay-checkout.png)
+![VibeMatch Razorpay-backed online payment option](docs/screenshots/razorpay-checkout.png)
 
 ## Project Structure
 

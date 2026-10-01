@@ -67,9 +67,9 @@ const Checkout = () => {
 
   const calculateTotals = () => {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = Math.round(subtotal * 0.18 * 100) / 100;
+    const tax = subtotal * 0.18;
     const shipping = subtotal > 1000 ? 0 : 50;
-    const total = Math.round((subtotal + tax + shipping) * 100) / 100;
+    const total = subtotal + tax + shipping;
     return { subtotal, tax, shipping, total };
   };
 
