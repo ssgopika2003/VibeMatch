@@ -12,6 +12,7 @@ import Chatbot from './components/Chatbot';
 // User Pages
 import Home from './pages/Home';
 import Recommendations from './pages/Recommendations';
+import VibeQuiz from './pages/VibeQuiz';
 import ProductDetail from './pages/ProductDetail';
 import Products from './pages/Products';
 import VirtualPreview from './pages/VirtualPreview';
@@ -77,6 +78,7 @@ function App() {
               <Chatbot />
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/vibe-quiz" element={<VibeQuiz />} />
                 <Route path="/recommendations" element={<Recommendations />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
