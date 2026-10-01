@@ -1,9 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Sparkles, TrendingUp, Zap, Heart, ShoppingBag, 
-  Star, ArrowRight, Play, Users, Award,
-  Shirt, Briefcase, Wine, Crown, Music, Gem, Church, Coffee
+  Sparkles, Gem, Heart, ShoppingBag,
+  Star, ArrowRight, Award,
+  Shirt, Briefcase, Wine, Crown, Music, Church, Coffee
 } from 'lucide-react';
 import { SITE_IMAGES, getSiteImage, VIBE_IMAGE_MAP } from '../config/siteImages';
 
@@ -85,9 +85,9 @@ const Home = () => {
       description: 'Smart algorithm creates perfect outfit combinations'
     },
     {
-      icon: <TrendingUp className="w-6 h-6" />,
-      title: 'Trend Analysis',
-      description: 'Stay ahead with real-time fashion insights'
+      icon: <Gem className="w-6 h-6" />,
+      title: 'Inclusive Color Matching',
+      description: 'Explore palettes matched to your undertone and preferences'
     },
     {
       icon: <Heart className="w-6 h-6" />,
@@ -197,28 +197,6 @@ const Home = () => {
               </Link>
             </div>
 
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="flex items-center justify-center gap-8 pt-8"
-            >
-              <div className="text-center">
-                <div className="text-3xl font-bold gradient-text">10K+</div>
-                <div className="text-sm text-gray-400">Styled Looks</div>
-              </div>
-              <div className="w-px h-12 bg-white/20" />
-              <div className="text-center">
-                <div className="text-3xl font-bold gradient-text">5K+</div>
-                <div className="text-sm text-gray-400">Happy Customers</div>
-              </div>
-              <div className="w-px h-12 bg-white/20" />
-              <div className="text-center">
-                <div className="text-3xl font-bold gradient-text">98%</div>
-                <div className="text-sm text-gray-400">Match Rate</div>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
 
@@ -367,22 +345,6 @@ const Home = () => {
                 <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-transparent" />
               </div>
               
-              {/* Floating Badge */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -bottom-6 -right-6 glass-strong p-6 rounded-2xl"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center">
-                    <Award className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">98%</div>
-                    <div className="text-xs text-gray-400">Match Rate</div>
-                  </div>
-                </div>
-              </motion.div>
             </motion.div>
 
             {/* Right - Content */}

@@ -17,11 +17,6 @@ if (envResult.error) {
   console.error('❌ Error loading .env:', envResult.error);
 } else {
   console.log('✅ .env loaded successfully');
-  console.log('🔍 AI env vars after load:', {
-    AI: process.env.AI,
-    AI_API_KEY: process.env.AI_API_KEY,
-    AI_OLLAMA: process.env.AI_OLLAMA
-  });
 }
 
 import express from 'express';

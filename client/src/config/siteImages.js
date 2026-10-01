@@ -8,7 +8,7 @@
 export const SITE_IMAGES = {
   // Hero Section Images
   hero: {
-    main: '/assets/images/hero/hero-main-banner.jpg',
+    main: '/assets/images/hero/hero-woman-fashion.jpg',
     woman: '/assets/images/hero/hero-woman-fashion.jpg',
     accessories: '/assets/images/hero/hero-accessories.jpg',
     lifestyle: '/assets/images/hero/hero-lifestyle.jpg',

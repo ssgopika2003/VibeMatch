@@ -4,10 +4,16 @@ client/node_modules/
 
 # Environment variables
 .env
+.env.*
+!.env.example
 
 # Build files
+dist/
+build/
 client/dist/
 client/build/
+client/.vite/
+.next/
 
 # Logs
 *.log
@@ -23,3 +29,4 @@ Thumbs.db
 
 # Uploads
 server/uploads/
+server/media/profile-image/
